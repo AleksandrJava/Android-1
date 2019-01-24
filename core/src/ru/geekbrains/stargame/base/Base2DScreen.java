@@ -3,35 +3,146 @@ package ru.geekbrains.stargame.base;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
+
+import ru.geekbrains.stargame.math.MatrixUtils;
+import ru.geekbrains.stargame.math.Rect;
 
 public class Base2DScreen implements Screen, InputProcessor {
+    public static final float V_LEN = 0.002f;
+
+    protected SpriteBatch batch;
+
+    private Rect screenBounds; // границы области рисования в пикселях
+    private Rect worldBounds; // границы проекции мировых координат
+    private Rect glBounds; // дефолтные границы проекции мир - gl
+
+    private Matrix4 worldToGl;
+    private Matrix3 screenToWorlds;
+
+    public Vector2 v;
+    public Vector2 touch;
+    public Vector2 buf;
+    public Vector2 pos;
+
+    @Override
+    public void show() {
+        System.out.println("show");
+        Gdx.input.setInputProcessor(this);
+        batch = new SpriteBatch();
+        this.screenBounds = new Rect();
+        this.worldBounds = new Rect();
+        this.glBounds = new Rect(0,0, 1f, 1f);
+        this.worldToGl = new Matrix4();
+        this.screenToWorlds = new Matrix3();
+        touch = new Vector2();
+        v = new Vector2(0,0);
+        touch = new Vector2(0, 0);
+        buf = new Vector2(0, 0);
+
+    }
+
+    @Override
+    public void render(float delta) {
+
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        System.out.println("resize w = " + width + " h = " + height);
+        screenBounds.setSize(width, height);
+        screenBounds.setLeft(0);
+        screenBounds.setBottom(0);
+
+        float aspect = width / (float) height;
+        worldBounds.setHeight(1f);
+        worldBounds.setWidth(1f * aspect);
+
+        MatrixUtils.calcTransitionMatrix(worldToGl, worldBounds, glBounds);
+        batch.setProjectionMatrix(worldToGl);
+        MatrixUtils.calcTransitionMatrix(screenToWorlds, screenBounds, worldBounds);
+    }
+
+    @Override
+    public void pause() {
+        System.out.println("pause");
+    }
+
+    @Override
+    public void resume() {
+        System.out.println("resume");
+    }
+
+    @Override
+    public void hide() {
+        System.out.println("hide");
+        dispose();
+    }
+
+    @Override
+    public void dispose() {
+        System.out.println("dispose");
+        batch.dispose();
+    }
+
+
     @Override
     public boolean keyDown(int keycode) {
+        System.out.println("keyDown keycode = " + keycode);
         return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
+        System.out.println("keyUp keycode = " + keycode);
         return false;
     }
 
     @Override
     public boolean keyTyped(char character) {
+        System.out.println("keyTyped character = " + character);
         return false;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        System.out.println("touchDown screenX = " + screenX + " screenY = " + screenY);
+        touch.set(screenX, screenBounds.getHeight() - screenY).mul(screenToWorlds);
+        v.set(touch.cpy().sub(pos).setLength(V_LEN));
+        return false;
+    }
+
+    public boolean touchDown(Vector2 touch, int pointer) {
+        System.out.println("touchDown touch.x = " + touch.x + " touch.y = " + touch.y);
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        System.out.println("touchUp screenX = " + screenX + " screenY = " + screenY);
+        touch.set(screenX, screenBounds.getHeight() - screenY).mul(screenToWorlds);
+        touchUp(touch, pointer);
+        return false;
+    }
+
+    public boolean touchUp(Vector2 touch, int pointer) {
+        System.out.println("touchUp touch.x = " + touch.x + " touch.y = " + touch.y);
         return false;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        System.out.println("touchDragged screenX = " + screenX + " screenY = " + screenY);
+        touch.set(screenX, screenBounds.getHeight() - screenY).mul(screenToWorlds);
+        touchDragged(touch, pointer);
+        return false;
+    }
+
+    public boolean touchDragged(Vector2 touch, int pointer) {
+        System.out.println("touchDragged touch.x = " + touch.x + " touch.y = " + touch.y);
         return false;
     }
 
@@ -43,40 +154,5 @@ public class Base2DScreen implements Screen, InputProcessor {
     @Override
     public boolean scrolled(int amount) {
         return false;
-    }
-
-    @Override
-    public void show() {
-        Gdx.input.setInputProcessor(this);
-    }
-
-    @Override
-    public void render(float delta) {
-
-    }
-
-    @Override
-    public void resize(int width, int height) {
-
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-        dispose();
-    }
-
-    @Override
-    public void dispose() {
-
     }
 }
