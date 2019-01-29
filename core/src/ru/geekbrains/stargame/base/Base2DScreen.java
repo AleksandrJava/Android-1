@@ -11,8 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import ru.geekbrains.stargame.math.MatrixUtils;
 import ru.geekbrains.stargame.math.Rect;
 
-public class Base2DScreen implements Screen, InputProcessor {
-    public static final float V_LEN = 0.002f;
+public abstract class Base2DScreen implements Screen, InputProcessor {
 
     protected SpriteBatch batch;
 
@@ -23,10 +22,7 @@ public class Base2DScreen implements Screen, InputProcessor {
     private Matrix4 worldToGl;
     private Matrix3 screenToWorlds;
 
-    public Vector2 v;
-    public Vector2 touch;
-    public Vector2 buf;
-    public Vector2 pos;
+    private Vector2 touch;
 
     @Override
     public void show() {
@@ -39,10 +35,6 @@ public class Base2DScreen implements Screen, InputProcessor {
         this.worldToGl = new Matrix4();
         this.screenToWorlds = new Matrix3();
         touch = new Vector2();
-        v = new Vector2(0,0);
-        touch = new Vector2(0, 0);
-        buf = new Vector2(0, 0);
-
     }
 
     @Override
@@ -64,6 +56,11 @@ public class Base2DScreen implements Screen, InputProcessor {
         MatrixUtils.calcTransitionMatrix(worldToGl, worldBounds, glBounds);
         batch.setProjectionMatrix(worldToGl);
         MatrixUtils.calcTransitionMatrix(screenToWorlds, screenBounds, worldBounds);
+        resize(worldBounds);
+    }
+
+    public void resize(Rect worldBounds) {
+
     }
 
     @Override
@@ -111,7 +108,7 @@ public class Base2DScreen implements Screen, InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         System.out.println("touchDown screenX = " + screenX + " screenY = " + screenY);
         touch.set(screenX, screenBounds.getHeight() - screenY).mul(screenToWorlds);
-        v.set(touch.cpy().sub(pos).setLength(V_LEN));
+        touchDown(touch, pointer);
         return false;
     }
 
