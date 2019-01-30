@@ -1,4 +1,4 @@
-package ru.geekbrains.stargame.sprite;
+package ru.geekbrains.stargame.sprite.menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
