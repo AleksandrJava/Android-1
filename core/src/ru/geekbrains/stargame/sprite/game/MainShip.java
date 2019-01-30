@@ -66,7 +66,6 @@ public class MainShip extends Sprite {
     }
 
     public boolean touchDown( Vector2 touch, int pointer ) {
-        System.out.println( "MainShip => touchDown" );
 
         if ( touch.x > 0 ) {
             this.touchPressedLeft  = false;
