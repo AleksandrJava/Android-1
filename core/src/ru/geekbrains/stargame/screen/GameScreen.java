@@ -1,7 +1,7 @@
 package ru.geekbrains.stargame.screen;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -10,45 +10,42 @@ import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.stargame.base.Base2DScreen;
 import ru.geekbrains.stargame.math.Rect;
+import ru.geekbrains.stargame.pool.BulletPool;
 import ru.geekbrains.stargame.sprite.Background;
-import ru.geekbrains.stargame.sprite.menu.BtExit;
-import ru.geekbrains.stargame.sprite.menu.Play;
 import ru.geekbrains.stargame.sprite.Star;
+import ru.geekbrains.stargame.sprite.game.MainShip;
 
-public class MenuScreen extends Base2DScreen {
+public class GameScreen extends Base2DScreen {
 
-    private Game game;
-
+    Music music = Gdx.audio.newMusic(Gdx.files.internal("sound/main.mp3"));
     private TextureAtlas atlas;
     private Texture bg;
     private Background background;
     private Star star[];
-    private Play play;
-    private BtExit exit;
+    private MainShip mainShip;
 
-
-    public MenuScreen(Game game) {
-        this.game = game;
-    }
+    private BulletPool bulletPool;
 
     @Override
     public void show() {
         super.show();
         bg = new Texture("textures/bg.png");
         background = new Background(new TextureRegion(bg));
-        atlas = new TextureAtlas("textures/menuAtlas.tpack");
-        star = new Star[256];
+        atlas = new TextureAtlas("textures/mainAtlas.tpack");
+        star = new Star[64];
         for (int i = 0; i < star.length; i++) {
             star[i] = new Star(atlas);
         }
-        play = new Play(atlas, game);
-        exit = new BtExit(atlas);
+        bulletPool = new BulletPool();
+        mainShip = new MainShip(atlas, bulletPool);
+        music.play();
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
         update(delta);
+        deleteAllDestroyed();
         draw();
     }
 
@@ -56,6 +53,12 @@ public class MenuScreen extends Base2DScreen {
         for (int i = 0; i < star.length; i++) {
             star[i].update(delta);
         }
+        mainShip.update(delta);
+        bulletPool.updateActiveSprites(delta);
+    }
+
+    public void deleteAllDestroyed() {
+        bulletPool.freeAllDestroyedActiveSprites();
     }
 
     public void draw() {
@@ -66,39 +69,51 @@ public class MenuScreen extends Base2DScreen {
         for (int i = 0; i < star.length; i++) {
             star[i].draw(batch);
         }
-        play.draw(batch);
-        exit.draw(batch);
+        mainShip.draw(batch);
+        bulletPool.drawActiveSprites(batch);
         batch.end();
     }
 
     @Override
     public void resize(Rect worldBounds) {
+        super.resize(worldBounds);
         background.resize(worldBounds);
         for (int i = 0; i < star.length; i++) {
             star[i].resize(worldBounds);
         }
-        play.resize(worldBounds);
-        exit.resize(worldBounds);
+        mainShip.resize(worldBounds);
     }
 
     @Override
     public void dispose() {
+        music.dispose();
         bg.dispose();
         atlas.dispose();
+        bulletPool.dispose();
         super.dispose();
     }
 
     @Override
+    public boolean keyDown(int keycode) {
+        mainShip.keyDown(keycode);
+        return super.keyDown(keycode);
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        mainShip.keyUp(keycode);
+        return super.keyUp(keycode);
+    }
+
+    @Override
     public boolean touchDown(Vector2 touch, int pointer) {
-        play.touchDown(touch, pointer);
-        exit.touchDown(touch, pointer);
+        mainShip.touchDown(touch, pointer);
         return super.touchDown(touch, pointer);
     }
 
     @Override
-    public boolean touchUp(Vector2 touch, int pointer){
-        play.touchUp(touch, pointer);
-        exit.touchUp(touch, pointer);
+    public boolean touchUp(Vector2 touch, int pointer) {
+        mainShip.touchUp(touch, pointer);
         return super.touchUp(touch, pointer);
     }
 }
