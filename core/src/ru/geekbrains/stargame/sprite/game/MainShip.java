@@ -25,7 +25,7 @@ public class MainShip extends Ship {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         this.bulletRegion = atlas.findRegion("bulletMainShip");
         this.bulletPool = bulletPool;
-        this.reloadInterval = 0.2f;
+        this.reloadInterval = 0.5f;
 
         this.shootSound = Gdx.audio.newSound(Gdx.files.internal("sound/shoot.mp3"));
         setHeightProportion(0.15f);

@@ -4,10 +4,12 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
+import ru.geekbrains.stargame.math.Rect;
 import ru.geekbrains.stargame.pool.BulletPool;
 
 public class Enemy extends Ship {
 
+    private Rect worldBounds;
     private Vector2 v0 = new Vector2();
 
     public Enemy(Sound shootSound, BulletPool bulletPool) {
@@ -22,6 +24,9 @@ public class Enemy extends Ship {
     public void update(float delta) {
         super.update(delta);
         this.pos.mulAdd(v, delta);
+        if (isOutside(worldBounds) &&  this.pos.y < worldBounds.getTop()) {
+            destroy();
+        }
     }
 
     public void set(
@@ -32,6 +37,7 @@ public class Enemy extends Ship {
             float bulletVY,
             int bulletDamage,
             float reloadInterval,
+            Rect worldBounds,
             float height,
             int hp
     ) {
@@ -43,6 +49,7 @@ public class Enemy extends Ship {
         this.damage = bulletDamage;
         this.reloadInterval = reloadInterval;
         setHeightProportion(height);
+        this.worldBounds = worldBounds;
         this.hp = hp;
         reloadTimer = reloadInterval;
         v.set(v0);
