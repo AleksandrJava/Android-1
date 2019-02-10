@@ -4,8 +4,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import ru.geekbrains.stargame.math.Rect;
 import ru.geekbrains.stargame.screen.GameScreen;
-import ru.geekbrains.stargame.sprite.menu.ScaledTouchUpButton;
-
 
 public class Play extends ScaledTouchUpButton {
 
