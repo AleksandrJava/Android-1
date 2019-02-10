@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.stargame.math.Rect;
 import ru.geekbrains.stargame.pool.BulletPool;
+import ru.geekbrains.stargame.pool.ExplosionPool;
 
 public class MainShip extends Ship {
 
@@ -21,12 +22,12 @@ public class MainShip extends Ship {
     private int leftPointer = INVALID_POINTER;
     private int rightPointer = INVALID_POINTER;
 
-    public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
+    public MainShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool) {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         this.bulletRegion = atlas.findRegion("bulletMainShip");
         this.bulletPool = bulletPool;
-        this.reloadInterval = 0.5f;
-
+        this.explosionPool = explosionPool;
+        this.reloadInterval = 0.2f;
         this.shootSound = Gdx.audio.newSound(Gdx.files.internal("sound/shoot.mp3"));
         setHeightProportion(0.15f);
         this.bulletV = new Vector2(0, 0.5f);
@@ -100,6 +101,7 @@ public class MainShip extends Ship {
         return false;
     }
 
+
     @Override
     public boolean touchDown(Vector2 touch, int pointer) {
         if (touch.x < worldBounds.pos.x) {
@@ -132,6 +134,18 @@ public class MainShip extends Ship {
             }
         }
         return super.touchUp(touch, pointer);
+    }
+    public boolean isBulletCollision(Rect bullet) {
+        return !(bullet.getRight() < getLeft()
+                || bullet.getLeft() > getRight()
+                || bullet.getBottom() > pos.y
+                || bullet.getTop() < getBottom()
+        );
+    }
+    @Override
+    public void destroy() {
+        super.destroy();
+        boom();
     }
 
     private void moveRight() {
