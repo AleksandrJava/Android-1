@@ -2,7 +2,6 @@ package ru.geekbrains.stargame.sprite.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
@@ -64,7 +63,7 @@ public class MainShip extends Ship {
     public void startNewGame() {
         stop();
         pos.x = worldBounds.pos.x;
-        this.hp = 10;
+        this.hp = 50;
         flushDestroy();
     }
 
